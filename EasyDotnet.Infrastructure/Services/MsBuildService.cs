@@ -294,7 +294,7 @@ public class MsBuildService(IVisualStudioLocator locator, IClientService clientS
       return "";
     }
 
-    if (project.IsNETCoreOrNETStandard)
+    if (project.IsNETCoreOrNETStandard || !clientService.UseVisualStudio)
     {
       return string.IsNullOrWhiteSpace(project.MSBuildProjectFullPath)
         ? throw new InvalidOperationException("[compat] Missing project path")
@@ -416,8 +416,8 @@ public class MsBuildService(IVisualStudioLocator locator, IClientService clientS
 
     return type switch
     {
-      MSBuildProjectType.SDK => ("dotnet", $"msbuild \"{targetPath}\" {config} {tfmArg} /t:restore /t:build {args ?? ""}"),
-      MSBuildProjectType.VisualStudio => (await locator.GetVisualStudioMSBuildPath(), $"\"{targetPath}\" {config} {tfmArg} /t:restore /t:build {args ?? ""}"),
+      MSBuildProjectType.SDK => ("dotnet", $"msbuild \"{targetPath}\" {config} {tfmArg} /t:build {args ?? ""}"),
+      MSBuildProjectType.VisualStudio => (await locator.GetVisualStudioMSBuildPath(), $"\"{targetPath}\" {config} {tfmArg} /t:build {args ?? ""}"),
       _ => throw new InvalidOperationException("Unknown MSBuild type")
     };
   }
